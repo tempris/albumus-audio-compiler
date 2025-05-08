@@ -1,0 +1,5 @@
+# Ignore checksum caches #
+#cache.json
+
+# Ignore compiled files #
+out

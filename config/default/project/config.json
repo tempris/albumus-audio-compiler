@@ -1,0 +1,32 @@
+{
+  "project": {
+    "formats": ["flac", "mp3", "ogg", "wav"]
+  },
+  "output": {
+    "image_output_format": "JPEG",
+    "image_quality": 95,
+    "art_sizes": {
+      "thumb": [150, 150],
+      "folder": [300, 300],
+      "large": [600, 600],
+      "cover": [1000, 1000]
+    }
+  },
+  "ffmpeg": {
+    "bitrate_strategy": {
+      "mp3": {
+        "fallback_qscale": 2
+      },
+      "ogg": {
+        "min_quality": 0,
+        "max_quality": 10,
+        "base_bitrate": 64000,
+        "step": 16000,
+        "fallback_qscale": 10
+      }
+    }
+  },
+  "logging": {
+    "log_relative_paths": true
+  }
+}

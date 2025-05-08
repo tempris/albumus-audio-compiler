@@ -1,0 +1,22 @@
+{
+  "01_ExampleAudioFileWAV.wav": {
+    "track": "1",
+    "tracknumber": "01",
+    "title": "Example Audio File WAV"
+  },
+  "02_ExampleAudioFileFLAC.flac": {
+    "track": "2",
+    "tracknumber": "02",
+    "title": "Example Audio File FLAC"
+  },
+  "03_ExampleAudioFileMP3.mp3": {
+    "track": "3",
+    "tracknumber": "03",
+    "title": "Example Audio File MP3"
+  },
+  "04_ExampleAudioFileOGG.ogg": {
+    "track": "4",
+    "tracknumber": "04",
+    "title": "Example Audio File OGG"
+  }
+}
