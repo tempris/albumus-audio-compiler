@@ -45,6 +45,8 @@ project_config_path = os.path.join(config_dir, 'config.json')
 
 project_config = load_project_config(default_config_path, project_config_path)
 
+logger.log("debug", LOG_TAG_COMPILE, "Loaded config:", project_config)
+
 log_relative = project_config.get("logging", {}).get("log_relative_paths", True)
 ffmpeg_strategy = project_config.get("ffmpeg", {}).get("bitrate_strategy", {})
 mp3_strategy = ffmpeg_strategy.get("mp3", {})
@@ -223,6 +225,22 @@ def convert_formats(input_file, base_name, output_dir, metadata, cover_art_path,
             add_metadata_to_file(output_file, metadata, fmt)
             add_cover_art(output_file, cover_art_path, fmt)
 
+def copy_track_text_file(input_file, base_name, output_dir):
+    input_txt_file = os.path.splitext(input_file)[0] + '.txt'
+    if os.path.exists(input_txt_file):
+        txt_output_dir = os.path.join(output_dir, 'txt')
+        os.makedirs(txt_output_dir, exist_ok=True)
+        output_txt_file = os.path.join(txt_output_dir, f"{base_name}.txt")
+        try:
+            with open(input_txt_file, 'rb') as src, open(output_txt_file, 'wb') as dst:
+                dst.write(src.read())
+            logger.log("info", LOG_TAG_COMPILE, "Copied track text file", {
+                "From": get_path_formatted(input_txt_file),
+                "To": get_path_formatted(output_txt_file)
+            })
+        except Exception as e:
+            logger.log("error", LOG_TAG_COMPILE, "Failed to copy text file:", e)
+
 def create_album_art_images(cover_art_path, output_folder, base_name):
     sizes = {
         k: tuple(v) for k, v in project_config.get("output", {}).get("art_sizes", {}).items()
@@ -266,6 +284,7 @@ def process_album(artist_dir, album_dir, output_base_dir, formats):
             title = metadata.get("title", base_name).replace(" ", "_")
             base_name_output = f"{track_number}_{title}"
             convert_formats(file_path, base_name_output, output_album_dir, metadata, cover_art_path, formats)
+            copy_track_text_file(file_path, base_name_output, output_album_dir)
         else:
             logger.log("warn", LOG_TAG_COMPILE, 'Track number not found for file:', {"file": file_name})
 
@@ -281,12 +300,13 @@ def process_all(input_base_dir, output_base_dir, formats):
 if __name__ == '__main__':
     input_base_dir = os.path.join(config_dir, 'in')
     output_base_dir = os.path.join(config_dir, 'out')
-    formats = project_config.get('formats', ['flac', 'mp3', 'ogg', 'wav'])
+    formats = project_config.get('project', {}).get('formats', ['flac', 'mp3', 'ogg', 'wav'])
 
     PATHS_PROJECT = {
         "Project Path": config_dir,
         "Input": input_base_dir,
-        "Output": output_base_dir
+        "Output": output_base_dir,
+        "Formats": formats
     }
     logger.log("begin", LOG_TAG_COMPILE, 'Running:', PATHS_PROJECT)
     process_all(input_base_dir, output_base_dir, formats)
